@@ -6,8 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C4746AA92DCC2D7E004B2E19 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C4746AA82DCC2D7E004B2E19 /* UserNotifications.framework */; };
+		C4746AAB2DCC34A9004B2E19 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C4746AAA2DCC34A9004B2E19 /* EventKit.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		C46C43F02DCB361E00085A59 /* ToDoList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDoList.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C4746AA82DCC2D7E004B2E19 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		C4746AAA2DCC34A9004B2E19 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -36,6 +43,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C4746AAB2DCC34A9004B2E19 /* EventKit.framework in Frameworks */,
+				C4746AA92DCC2D7E004B2E19 /* UserNotifications.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,6 +55,7 @@
 			isa = PBXGroup;
 			children = (
 				C46C43F22DCB361E00085A59 /* ToDoList */,
+				C4746AA72DCC2D7E004B2E19 /* Frameworks */,
 				C46C43F12DCB361E00085A59 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -56,6 +66,15 @@
 				C46C43F02DCB361E00085A59 /* ToDoList.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		C4746AA72DCC2D7E004B2E19 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C4746AAA2DCC34A9004B2E19 /* EventKit.framework */,
+				C4746AA82DCC2D7E004B2E19 /* UserNotifications.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

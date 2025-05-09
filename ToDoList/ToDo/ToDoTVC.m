@@ -6,7 +6,7 @@
 //
 
 #import "ToDoTVC.h"
-#import "AddingTaskVC.h"
+
 
 @interface ToDoTVC ()
 @property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
@@ -17,6 +17,7 @@
 @property NSMutableArray<List *> *high;
 @property NSMutableArray<List *> *medium;
 @property NSMutableArray<List *> *low;
+@property (weak, nonatomic) IBOutlet UIImageView *emptyImage;
 
 @end
 
@@ -32,15 +33,23 @@
     target:self action:@selector(rightButtonTapped)];
 
     self.navigationItem.rightBarButtonItem = rightButton;
+    self.navigationItem.title = @"ToDo List";
     [self refreshTable];
+    
 }
 
 - (void)refreshTable {
     self.arr = [UserDefaultMethods getToDo];
-    [self seperate];
-    self.filteredArray = @[self.high, self.medium, self.low];
-
-    [self.toDoTable reloadData];
+    if([_arr count] == 0){
+        [_emptyImage setHidden:NO];
+        _emptyImage.image = [UIImage imageNamed:@"empty"];
+    }else{
+        [_emptyImage setHidden:YES];
+        [self seperate];
+        self.filteredArray = @[self.high, self.medium, self.low];
+        
+        [self.toDoTable reloadData];
+    }
 }
 
 - (void)seperate {
@@ -91,53 +100,89 @@
     return 3;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    NSArray *sectionArray = self.filteredArray[section];
+    if (sectionArray.count == 0) return nil;
+    
+    UILabel *label = [[UILabel alloc] init];
+    label.textColor = [UIColor labelColor];
+    label.font = [UIFont boldSystemFontOfSize:16];
+    label.textAlignment = NSTextAlignmentLeft;
+
     switch (section) {
-        case 0:
-            return @"High Priority";
-        case 1:
-            return @"Medium Priority";
-        case 2:
-            return @"Low Priority";
-        default:
-            return @"Unknown Priority";
+        case 0: label.text = @"  High Priority"; break;
+        case 1: label.text = @"  Medium Priority"; break;
+        case 2: label.text = @"  Low Priority"; break;
+        default: label.text = @"  Unknown Priority"; break;
     }
+
+    UIView *container = [[UIView alloc] init];
+    container.backgroundColor = [UIColor systemBackgroundColor];
+
+    label.translatesAutoresizingMaskIntoConstraints = NO;
+    [container addSubview:label];
+
+    // Separator line
+    UIView *separator = [[UIView alloc] init];
+    separator.backgroundColor = [UIColor lightGrayColor];
+    separator.translatesAutoresizingMaskIntoConstraints = NO;
+    [container addSubview:separator];
+
+    [NSLayoutConstraint activateConstraints:@[
+        [separator.heightAnchor constraintEqualToConstant:1],
+        [separator.leadingAnchor constraintEqualToAnchor:container.leadingAnchor constant:10],
+        [separator.trailingAnchor constraintEqualToAnchor:container.trailingAnchor constant:-10],
+        [separator.bottomAnchor constraintEqualToAnchor:container.bottomAnchor]
+    ]];
+
+    return container;
 }
 
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    switch (section) {
-        case 0:
-            return self.high.count;
-        case 1:
-            return self.medium.count;
-        case 2:
-            return self.low.count;
-        default:
-            return 0;
+    if (section < self.filteredArray.count) {
+        return [self.filteredArray[section] count];
     }
+    return 0;
 }
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    NSArray *sectionArray = self.filteredArray[section];
+    return sectionArray.count > 0 ? 44 : 0;
+}
+
+
 
 - (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
     static NSString *ident = @"cell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:ident forIndexPath:indexPath];
+    CustomCellVC *cell = [tableView dequeueReusableCellWithIdentifier:ident forIndexPath:indexPath];
     
     List *list = self.filteredArray[indexPath.section][indexPath.row];
-    cell.textLabel.text = list.name;
+    cell.nameLabel.text = list.name;
     NSString *priorityImageName = (list.priority == 0) ? @"high" : (list.priority == 1) ? @"medium" : @"low";
-    cell.imageView.image = [UIImage imageNamed:priorityImageName];
+    cell.imageIcon.image = [UIImage imageNamed:priorityImageName];
+    cell.dateValue.date = list.date;
     
     return cell;
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 100.0;
+}
+
+
+
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Alert!!"
-            message:@"Do you want to delete?"
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Confirm Deletion"
+            message:@"Are you sure you want to delete this task?"
             preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleCancel handler:nil];
-        
-        UIAlertAction *ok = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+
+        UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Cancel"
+        style:UIAlertActionStyleDestructive handler:nil];
+
+        UIAlertAction *ok = [UIAlertAction actionWithTitle:@"Yes"
+        style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             List *taskToDelete = self.filteredArray[indexPath.section][indexPath.row];
             NSMutableArray *arrayToUpdate;
             switch (indexPath.section) {

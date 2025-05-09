@@ -16,6 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSMutableArray<List *> *)getDoing;
 +(void) setDoing:(NSMutableArray*) data;
+
++ (NSMutableArray<List *> *)getDone;
++(void) setDone:(NSMutableArray*) data;
 @end
 
 NS_ASSUME_NONNULL_END

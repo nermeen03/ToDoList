@@ -6,6 +6,7 @@
 //
 
 #import "AddingTaskVC.h"
+#import "CommonMethods.h"
 
 @interface AddingTaskVC ()
 @property (weak, nonatomic) IBOutlet UITextField *nameField;
@@ -14,13 +15,14 @@
 @property (weak, nonatomic) IBOutlet UIDatePicker *dateField;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *notifyField;
 @property (weak, nonatomic) IBOutlet UILabel *message;
+@property (weak, nonatomic) IBOutlet UIButton *uploadButton;
 
 @property NSMutableString *error;
 @property NSString *prio;
 @property BOOL notify;
 @property NSMutableArray *arr;
-
-
+@property (nonatomic, strong) NSString *savedFileName;
+@property (nonatomic, strong) NSURL *savedFileURL;
 
 @end
 
@@ -28,6 +30,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.descField.layer.borderColor = [UIColor systemGray6Color].CGColor;
+    self.descField.layer.borderWidth = 1.0;
+    self.descField.layer.cornerRadius = 5.0;
+
+    
     self.arr = [UserDefaultMethods getToDo];
     self.error = [NSMutableString string];
     [self.dateField setMinimumDate:[NSDate date]];
@@ -46,6 +54,7 @@
         return;
     }
     
+
     NSDate *selectedDate = self.dateField.date;
     NSInteger priority = self.prioField.selectedSegmentIndex;
     NSLog(@"%ld",(long)priority);
@@ -54,7 +63,13 @@
             priority = 0;
         }
     List *list = [List new];
-    [list setName:self.nameField.text desc:self.descField.text priority:priority date:selectedDate notify:self.notify status:0];
+    NSString *notifyId = [[NSUUID UUID] UUIDString];
+    [list setName:self.nameField.text desc:self.descField.text priority:priority date:selectedDate notify:self.notify status:0 notifyId:notifyId];
+    list.savedFileName = self.savedFileName;
+    list.savedFileURL = self.savedFileURL;
+    if (self.notify) {
+        [CommonMethods scheduleNotificationWithText:self.nameField.text atDate:self.dateField.date notifyId:notifyId];
+    }
     
     [self.arr addObject:list];
     [UserDefaultMethods setToDo:self.arr];
@@ -85,6 +100,60 @@
     NSString *selected = [self.notifyField titleForSegmentAtIndex:self.notifyField.selectedSegmentIndex];
     self.notify = [selected isEqualToString:@"No"] ? NO : YES;
 }
+
+
+
+- (IBAction)uploadButtonTapped:(id)sender {
+    [self openDocumentPicker];
+}
+
+- (void)openDocumentPicker {
+    UIDocumentPickerViewController *documentPicker = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[@"public.item"] inMode:UIDocumentPickerModeImport];
+    documentPicker.delegate = self;
+    [self presentViewController:documentPicker animated:YES completion:nil];
+}
+
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+    NSURL *fileURL = urls.firstObject;
+
+    NSString *fileName = fileURL.lastPathComponent;
+    self.savedFileName = fileName;
+    self.savedFileURL = fileURL;
+
+    NSLog(@"File selected: %@", fileName);
+    NSLog(@"File URL: %@", fileURL);
+
+    NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].firstObject;
+
+    NSURL *destinationURL = [documentsDirectoryURL URLByAppendingPathComponent:fileName];
+
+    if ([[NSFileManager defaultManager] fileExistsAtPath:destinationURL.path]) {
+        NSError *removeError;
+        [[NSFileManager defaultManager] removeItemAtURL:destinationURL error:&removeError];
+        if (removeError) {
+            NSLog(@"Error removing existing file: %@", removeError.localizedDescription);
+        }
+    }
+
+    NSError *error;
+    [[NSFileManager defaultManager] copyItemAtURL:fileURL toURL:destinationURL error:&error];
+
+    if (error) {
+        NSLog(@"Error saving file: %@", error.localizedDescription);
+    } else {
+        NSLog(@"File saved to: %@", destinationURL.path);
+        [_uploadButton setTitle:@"File Saved" forState:UIControlStateNormal];
+    }
+}
+
+
+- (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
+    NSLog(@"Document picker was cancelled");
+}
+
+
+
+
 
 
 

@@ -9,10 +9,12 @@
 #import "List.h"
 #import "UserDefaultMethods.h"
 #import "ToDoAddDelegate.h"
+#import "DoneTVC.h"
+#import "ToDoTVC.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DetailsVC : UIViewController
+@interface DetailsVC : UIViewController<UIDocumentInteractionControllerDelegate,UIDocumentPickerDelegate>
 @property List *task;
 @property NSMutableArray *arr;
 @property NSInteger index;

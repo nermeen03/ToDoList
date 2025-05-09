@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AddingTaskVC : UIViewController
+@interface AddingTaskVC : UIViewController<UIDocumentPickerDelegate>
 @property (nonatomic, weak) id<ToDoAddDelegate> ref;
 
 @end

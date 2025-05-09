@@ -10,6 +10,8 @@
 #import "UserDefaultMethods.h"
 #import "ToDoAddDelegate.h"
 #import "DetailsVC.h"
+#import "AddingTaskVC.h"
+#import "CustomCellVC.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

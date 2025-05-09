@@ -1,33 +1,34 @@
 //
-//  DoingTVC.m
+//  DoneTVC.m
 //  ToDoList
 //
 //  Created by Nermeen Mohamed on 07/05/2025.
 //
 
-#import "DoingTVC.h"
+#import "DoneTVC.h"
 
-@interface DoingTVC ()
+@interface DoneTVC ()
 @property (weak, nonatomic) IBOutlet UITableView *myTable;
 @property NSMutableArray *arr;
 @property NSArray *shown;
-@property (weak, nonatomic) IBOutlet UIImageView *emptyImage;
 @property UIBarButtonItem *rightButton;
+@property (weak, nonatomic) IBOutlet UIImageView *emptyImage;
+
 @end
 
-@implementation DoingTVC
+@implementation DoneTVC
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     _myTable.delegate = self;
     _myTable.dataSource = self;
-    _arr = [UserDefaultMethods getDoing];
+    _arr = [UserDefaultMethods getDone];
     _shown = @[[NSMutableArray arrayWithArray:_arr]];
     _rightButton = [[UIBarButtonItem alloc]initWithTitle:@"Sort" style:UIBarButtonItemStyleDone
     target:self action:@selector(sortButtonTapped)];
 
     self.navigationItem.rightBarButtonItem = _rightButton;
-    self.navigationItem.title = @"Doing List";
+    self.navigationItem.title = @"Done List";
     if(_arr.count ==  0){
         [_emptyImage setHidden:NO];
         self->_rightButton.hidden = YES;
@@ -57,17 +58,14 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return [_shown[section] count];
 }
-
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     NSArray *sectionArray = self.shown[section];
     return sectionArray.count > 0 ? 44 : 0;
 }
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 100.0;
-}
+
 - (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
     
-    static NSString *ident = @"doing";
+    static NSString *ident = @"done";
     CustomCellVC *cell = [tableView dequeueReusableCellWithIdentifier:ident forIndexPath:indexPath];
     List *list = _shown[indexPath.section][indexPath.row];
     cell.nameLabel.text = list.name;
@@ -91,9 +89,8 @@
         style:UIAlertActionStyleDefault
            handler:^(UIAlertAction * _Nonnull action) {
             List *delete = self.shown[indexPath.section][indexPath.row];
-            //[self.shown[indexPath.section] removeObject:delete];
             [self.arr removeObject:delete];
-            [UserDefaultMethods setDoing:self->_arr];
+            [UserDefaultMethods setDone:self->_arr];
             
             NSLog(@"%ld",(long)indexPath.section);
             NSLog(@"%ld",(long)indexPath.row);
@@ -125,8 +122,9 @@
     
     [self.navigationController pushViewController:pVC animated:YES];
 }
-
-
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 100.0;
+}
 /*
 #pragma mark - Navigation
 
@@ -175,16 +173,12 @@
         [separator.bottomAnchor constraintEqualToAnchor:container.bottomAnchor]
     ]];
 
-
     return container;
 }
 - (void)refreshTable {
-    _arr = [UserDefaultMethods getDoing];
+    _arr = [UserDefaultMethods getDone];
     _shown = @[[NSMutableArray arrayWithArray:_arr]];
     [self.myTable reloadData];
-    NSLog(@"%ld",_shown.count);
-    _rightButton.title = @"Sort";
-    
     if(self->_arr.count ==  0){
         [self->_emptyImage setHidden:NO];
         self->_rightButton.hidden = YES;
@@ -194,7 +188,6 @@
         self->_rightButton.hidden = NO;
     }
 }
-
 
 - (void)seperate {
     NSMutableArray *high = [NSMutableArray array];

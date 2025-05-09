@@ -1,5 +1,5 @@
 //
-//  DoingTVC.h
+//  DoneTVC.h
 //  ToDoList
 //
 //  Created by Nermeen Mohamed on 07/05/2025.
@@ -13,7 +13,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DoingTVC : UIViewController<UITableViewDelegate,UITableViewDataSource,ToDoAddDelegate>
+@interface DoneTVC : UIViewController<UITableViewDelegate,UITableViewDataSource,ToDoAddDelegate>
 
 @end
 

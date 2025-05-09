@@ -16,9 +16,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSDate *date;
 @property (nonatomic) BOOL notify;
 @property NSInteger status;
-@property (nonatomic, strong) NSString *id;
+@property (nonatomic, strong) NSString *taskID;
+@property (nonatomic, strong) NSString *notifyID;
+@property (nonatomic, strong) NSString *savedFileName;
+@property (nonatomic, strong) NSURL *savedFileURL;
 
-- (void)setName:(NSString *)name desc:(NSString *)des priority:(NSInteger)prio date:(NSDate*) date notify:(BOOL)notify status:(NSInteger)status;
+- (void)setName:(NSString *)name desc:(NSString *)des priority:(NSInteger)prio date:(NSDate*) date notify:(BOOL)notify status:(NSInteger)status notifyId:(NSString*) str;
 
 @end
 
